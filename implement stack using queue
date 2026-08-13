@@ -1,0 +1,72 @@
+#include <stdbool.h>
+#include <stdlib.h>
+
+#define QUEUE_CAPACITY 200
+
+typedef struct {
+    int data[QUEUE_CAPACITY];
+    int front;
+    int rear;
+    int size;
+} Queue;
+
+typedef struct {
+    Queue q;
+} MyStack;
+
+// Helper Queue Operations
+void qPush(Queue* q, int x) {
+    q->data[q->rear] = x;
+    q->rear = (q->rear + 1) % QUEUE_CAPACITY;
+    q->size++;
+}
+
+int qPop(Queue* q) {
+    int val = q->data[q->front];
+    q->front = (q->front + 1) % QUEUE_CAPACITY;
+    q->size--;
+    return val;
+}
+
+int qFront(Queue* q) {
+    return q->data[q->front];
+}
+
+bool qEmpty(Queue* q) {
+    return q->size == 0;
+}
+
+// Stack Implementation
+MyStack* myStackCreate() {
+    MyStack* stack = (MyStack*)malloc(sizeof(MyStack));
+    stack->q.front = 0;
+    stack->q.rear = 0;
+    stack->q.size = 0;
+    return stack;
+}
+
+void myStackPush(MyStack* obj, int x) {
+    qPush(&(obj->q), x);
+    
+    // Rotate the queue elements except the last one added
+    int currentSize = obj->q.size;
+    for (int i = 0; i < currentSize - 1; i++) {
+        qPush(&(obj->q), qPop(&(obj->q)));
+    }
+}
+
+int myStackPop(MyStack* obj) {
+    return qPop(&(obj->q));
+}
+
+int myStackTop(MyStack* obj) {
+    return qFront(&(obj->q));
+}
+
+bool myStackEmpty(MyStack* obj) {
+    return qEmpty(&(obj->q));
+}
+
+void myStackFree(MyStack* obj) {
+    free(obj);
+}
