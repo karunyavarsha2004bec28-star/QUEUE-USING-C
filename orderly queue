@@ -1,0 +1,36 @@
+#include <string.h>
+#include <stdlib.h>
+
+// Custom comparator for qsort
+int compareChars(const void* a, const void* b) {
+    return (*(char*)a - *(char*)b);
+}
+
+char* orderlyQueue(char* s, int k) {
+    int len = strlen(s);
+    char* result = (char*)malloc((len + 1) * sizeof(char));
+    strcpy(result, s);
+
+    // Case 1: If k > 1, sort the string entirely
+    if (k > 1) {
+        qsort(result, len, sizeof(char), compareChars);
+        return result;
+    }
+
+    // Case 2: If k == 1, check all possible cyclic rotations
+    char* temp = (char*)malloc((len + 1) * sizeof(char));
+    for (int i = 1; i < len; i++) {
+        // Construct the rotation: s[i...len-1] followed by s[0...i-1]
+        strncpy(temp, s + i, len - i);
+        strncpy(temp + (len - i), s, i);
+        temp[len] = '\0';
+
+        // Update if we find a lexicographically smaller string
+        if (strcmp(temp, result) < 0) {
+            strcpy(result, temp);
+        }
+    }
+    
+    free(temp);
+    return result;
+}
