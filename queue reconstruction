@@ -1,0 +1,45 @@
+#include <stdlib.h>
+#include <string.h>
+
+// Custom comparator function for qsort
+int compare(const void* a, const void* b) {
+    int* p1 = *(int**)a;
+    int* p2 = *(int**)b;
+    
+    // Sort descending by height
+    if (p1[0] != p2[0]) {
+        return p2[0] - p1[0];
+    }
+    // If heights are equal, sort ascending by k
+    return p1[1] - p2[1];
+}
+
+int** reconstructQueue(int** people, int peopleSize, int* peopleColSize, int* returnSize, int** returnColumnSizes) {
+    // 1. Sort the input array using our custom comparator
+    qsort(people, peopleSize, sizeof(int*), compare);
+    
+    // 2. Allocate the result array pointers
+    int** queue = (int**)malloc(peopleSize * sizeof(int*));
+    *returnColumnSizes = (int*)malloc(peopleSize * sizeof(int));
+    *returnSize = peopleSize;
+    
+    // Initialize standard column sizes for the return matrix
+    for (int i = 0; i < peopleSize; i++) {
+        (*returnColumnSizes)[i] = 2;
+    }
+    
+    // 3. Shift elements and insert based on the 'k' index
+    for (int i = 0; i < peopleSize; i++) {
+        int k = people[i][1];
+        
+        // Shift remaining items right to make room for insertion at index 'k'
+        for (int j = i; j > k; j--) {
+            queue[j] = queue[j - 1];
+        }
+        
+        // Place the current person at their target index
+        queue[k] = people[i];
+    }
+    
+    return queue;
+}
