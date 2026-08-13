@@ -1,0 +1,63 @@
+#include <stdbool.h>
+#include <stdlib.h>
+
+#define STACK_CAPACITY 100
+
+typedef struct {
+    int data[STACK_CAPACITY];
+    int top;
+} Stack;
+
+typedef struct {
+    Stack stack_in;
+    Stack stack_out;
+} MyQueue;
+
+void stackPush(Stack* s, int x) {
+    s->data[++(s->top)] = x;
+}
+
+int stackPop(Stack* s) {
+    return s->data[(s->top)--];
+}
+
+int stackPeek(Stack* s) {
+    return s->data[s->top];
+}
+
+bool stackEmpty(Stack* s) {
+    return s->top == -1;
+}
+
+MyQueue* myQueueCreate() {
+    MyQueue* obj = (MyQueue*)malloc(sizeof(MyQueue));
+    obj->stack_in.top = -1;
+    obj->stack_out.top = -1;
+    return obj;
+}
+
+void myQueuePush(MyQueue* obj, int x) {
+    stackPush(&(obj->stack_in), x);
+}
+
+int myQueuePeek(MyQueue* obj) {
+    if (stackEmpty(&(obj->stack_out))) {
+        while (!stackEmpty(&(obj->stack_in))) {
+            stackPush(&(obj->stack_out), stackPop(&(obj->stack_in)));
+        }
+    }
+    return stackPeek(&(obj->stack_out));
+}
+
+int myQueuePop(MyQueue* obj) {
+    myQueuePeek(obj);
+    return stackPop(&(obj->stack_out));
+}
+
+bool myQueueEmpty(MyQueue* obj) {
+    return stackEmpty(&(obj->stack_in)) && stackEmpty(&(obj->stack_out));
+}
+
+void myQueueFree(MyQueue* obj) {
+    free(obj);
+}
